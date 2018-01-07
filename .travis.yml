@@ -1,5 +1,27 @@
+
+sudo: required
 language: java
-install: mvn install -DskipTests=true -Dgpg.skip=true
+
 jdk:
   - openjdk7
   - oraclejdk8
+
+
+script:
+  - mvn clean cobertura:cobertura -Dtest=ConnectionTest#attemptReconnectsAfterAFailedReconnect -DfailIfNoTests=false
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/socket.io-client-java/target/site/cobertura
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "fm5nsEyYk0QA0AW5IDBdJlPrWmLJnEoBfnaUxF2Ap/kjqubCxeEHLNqUdjKKNZyTeepoxDO6TNE8YLWve/T+NKJBlVt518MPOZBBraqwsRp3dqmmCheTGxqgWSqf2h0odINg7qjH+cRV4BZ1WiecBJTDzWlAumOnkNbf4NdzeZE7KwQaaFrqQ8KvWJZzfTJqPG5PdHHumbdLdkbpQprT7bV0BwRL9UItznbbduCD1XHvXyvhK11+k1jaY9E/gUGMDPxdy0dwSgHGos+3yUx5WNLTh9h5r8bcuxpT9uNO4Q/iECG7SNzhM1nRlDHMsaS1Pd7/QWqMId9j6Hxn4BStqcbziA1OcUnT/qEkm850uZ+1hE9P/RAzwSH/N4qopkc7LevQh9HED5zAXkufJhDyxuVnTf9Ek6L6z/V+D0W58GgamauLA+UxZESh7OO/AvzPCpiDFzIbVGvqJgYxeFBKsgWcT2jVBFJKBHg4+YcVavjuQCEao514MTCAKk9UDSMkeu626tZkP+s/8d7JHTJNR6LkBbRd3ZE/7XOBpKnPCndksTTpdlQzaZkraf9wR+DIj84mxqApQP6lMLzk3JFvGxfvUhZ/ccnCjywhYPHuUXYVXFbsmQtFZ8dmEC09S+VofPHu0WnlsTONaN4YiAYJh6MOwzkThOJmrV7NO09ACtI="
+
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
